@@ -63,9 +63,13 @@ namespace Lasers
             {
                 end = hits[0].point;
 
-                if (!string.IsNullOrEmpty(armTag) && hits[0].collider.CompareTag(armTag))
+                if (hits[0].collider.gameObject.layer == LayerMask.NameToLayer("LaserBlocker"))
                 {
+                    var destructible = hits[0].collider.GetComponentInParent<DestructibleTilemapWall>();
+                    if (destructible != null)
+                        destructible.CarveHoleAtHit(hits[0].point, 1); 
                 }
+
             }
 
             lr.SetPosition(0, new UVec3(start.x, start.y, lineZ));
