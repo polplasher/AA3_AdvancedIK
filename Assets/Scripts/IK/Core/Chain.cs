@@ -1,20 +1,16 @@
-using Unity.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public sealed class Chain : MonoBehaviour
 {
-    [Header("Chain"), SerializeField] private Transform[] joints;
-
-    [Header("Computed (read-only)"), ReadOnly, SerializeField]
-    private float[] lengths;
-
-    [ReadOnly, SerializeField] private float totalLength;
+    [SerializeField] private Transform[] joints;
 
     public Transform[] Joints => joints;
     public int JointCount => joints?.Length ?? 0;
     public int SegmentCount => Mathf.Max(0, JointCount - 1);
-    public float TotalLength => totalLength;
+    public float TotalLength { get; private set; }
+
+    private float[] lengths;
 
     public bool IsValid()
     {
@@ -39,7 +35,7 @@ public sealed class Chain : MonoBehaviour
         if (!IsValid()) return;
 
         lengths = new float[SegmentCount];
-        totalLength = 0f;
+        TotalLength = 0f;
 
         for (int i = 0; i < SegmentCount; i++)
         {
@@ -48,7 +44,7 @@ public sealed class Chain : MonoBehaviour
             len = Mathf.Max(0.0001f, len);
 
             lengths[i] = len;
-            totalLength += len;
+            TotalLength += len;
         }
     }
 

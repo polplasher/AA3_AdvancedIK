@@ -3,8 +3,9 @@ using UnityEngine.Events;
 
 public sealed class ButtonTrigger : MonoBehaviour
 {
-    [Tooltip("Tag of end-effector collider, e.g. EndEffector")]
-    [SerializeField] private string endEffectorTag = "EndEffector";
+    [Tooltip("Tag of end-effector collider, e.g. EndEffector")] [SerializeField]
+    private string endEffectorTag = "EndEffector";
+
     [SerializeField] private UnityEvent onPressed;
 
     private bool pressed;
@@ -18,8 +19,9 @@ public sealed class ButtonTrigger : MonoBehaviour
         onPressed?.Invoke();
     }
 
-    public void ResetButton()
+    private void OnTriggerExit2D(Collider2D other)
     {
+        if (!other.CompareTag(endEffectorTag)) return;
         pressed = false;
     }
 }

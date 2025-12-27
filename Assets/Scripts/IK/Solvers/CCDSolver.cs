@@ -47,9 +47,6 @@ public class CCDSolver
             iterations++;
 
             // Calculate the starting joint index based on bounce depth
-            // bounceDepth = 0: start at joint (n-2), process 1 joint
-            // bounceDepth = 1: start at joint (n-3), process 2 joints
-            // bounceDepth = k: start at joint (n-2-k), process (k+1) joints
             int startJoint = n - 2 - frameDepth;
 
             // Ensure we don't go below root (joint 0)
@@ -85,7 +82,7 @@ public class CCDSolver
 
         // Update bounce depth for next call (cycles from 0 to n-2)
         int maxBounceDepth = Mathf.Max(0, n - 2);
-        this.bounceDepth = frameDepth + 1 > maxBounceDepth ? 0 : frameDepth + 1;
+        bounceDepth = frameDepth + 1 > maxBounceDepth ? 0 : frameDepth + 1;
 
         return new IKResult(iterations, error, error <= settings.Epsilon);
     }

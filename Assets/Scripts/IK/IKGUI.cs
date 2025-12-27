@@ -4,8 +4,6 @@ using UnityEngine.UI;
 
 public sealed class IKGUI : MonoBehaviour
 {
-    [Header("Refs")] [SerializeField] private IKController controller;
-
     [Header("UI"), SerializeField] private TextMeshProUGUI algorithmText;
     [SerializeField] private TextMeshProUGUI iterationsText;
     [SerializeField] private Slider iterationsSlider;
@@ -13,9 +11,12 @@ public sealed class IKGUI : MonoBehaviour
     [SerializeField] private Slider epsilonSlider;
     [SerializeField] private TextMeshProUGUI infoText;
 
+    [Header("References")] [SerializeField]
+    private IKController controller;
+
     private void Start()
     {
-        algorithmText.text = $"Algorithm: {controller.Algorithm}";
+        algorithmText.text = $"Algorithm: {controller.algorithm}";
         iterationsSlider.value = controller.MaxIterations;
         iterationsSlider.onValueChanged.AddListener(v => controller.MaxIterations = Mathf.RoundToInt(v));
 
@@ -31,8 +32,8 @@ public sealed class IKGUI : MonoBehaviour
         iterationsText.text = $"Max Iterations: {controller.MaxIterations}";
         epsilonText.text = $"Epsilon: {controller.Epsilon:0.0000}";
         infoText.text =
-            $"IterUsed: {r.IterationsUsed}\n" +
-            $"Error: {r.FinalError:0.0000}\n" +
+            $"Iterations used: {r.IterationsUsed}\n" +
+            $"Distance to target: {r.FinalError:0.00}\n" +
             $"Reached: {r.Reached}";
     }
 }

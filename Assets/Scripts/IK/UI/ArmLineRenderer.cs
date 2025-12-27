@@ -8,7 +8,11 @@ public sealed class ArmLineRenderer : MonoBehaviour
     private LineRenderer lr;
 
     private void Awake() => lr = GetComponent<LineRenderer>();
-    private void Update() => Draw();
+
+    private void Update()
+    {
+        Draw();
+    }
 
     private void Draw()
     {

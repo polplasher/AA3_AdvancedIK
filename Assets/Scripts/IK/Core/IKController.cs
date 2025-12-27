@@ -3,9 +3,11 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class IKController : MonoBehaviour
 {
-    [Header("References")] [SerializeField]
-    private Chain chain;
+    [Header("Settings")] public IKAlgorithm algorithm;
+    [Min(1), SerializeField] private int maxIterations = 12;
+    [Range(0.0001f, 20f), SerializeField] private float epsilon = 0.02f;
 
+    [Header("References"), SerializeField] private Chain chain;
     [field: SerializeField] public Transform Target { get; set; }
 
     [Tooltip(
@@ -13,22 +15,8 @@ public sealed class IKController : MonoBehaviour
     [SerializeField]
     private Rigidbody2D endEffectorBody;
 
-    [Header("Algorithm")] [SerializeField] private IKAlgorithm algorithm = IKAlgorithm.FABRIK;
-
-    [Header("Settings")] [Min(1)] [SerializeField]
-    private int maxIterations = 12;
-
-    [Min(0.0001f)] [SerializeField] private float epsilon = 0.02f;
-
     private readonly CCDSolver ccdSolver = new();
-
     private Vector2[] positions;
-
-    public IKAlgorithm Algorithm
-    {
-        get => algorithm;
-        set => algorithm = value;
-    }
 
     public int MaxIterations
     {
@@ -42,7 +30,7 @@ public sealed class IKController : MonoBehaviour
         set => epsilon = Mathf.Max(0.0001f, value);
     }
 
-    [field: Header("Runtime (read-only)")] public IKResult LastResult { get; private set; }
+    public IKResult LastResult { get; private set; }
 
     private void Awake()
     {
@@ -59,7 +47,7 @@ public sealed class IKController : MonoBehaviour
         if (chain.SegmentCount > 0 && chain.TotalLength <= 0.0001f)
             chain.Rebuild();
 
-        var settings = new IKSettings
+        IKSettings settings = new()
         {
             MaxIterations = maxIterations,
             Epsilon = epsilon
