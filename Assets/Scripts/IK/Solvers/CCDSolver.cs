@@ -5,7 +5,7 @@ public class CCDSolver
     /// <summary>
     /// Internal bounce depth for the single CCD chain in the scene.
     /// </summary>
-    private int BounceDepth;
+    private int bounceDepth;
 
     /// <summary>
     /// CCD solver with bounce mechanism - progressively processes joints in a cycling pattern.
@@ -17,20 +17,20 @@ public class CCDSolver
     /// - Call 3: Process the last 3 joints
     /// - ...and so on until all joints are processed, then the cycle repeats
     /// </summary>
-    public IKResult2D Solve(Chain chain, Vector2 target, IKSettings2D settings, ref Vector2[] positions)
+    public IKResult Solve(Chain chain, Vector2 target, IKSettings settings, ref Vector2[] positions)
     {
         if (!chain.IsValid())
-            return new IKResult2D(0, float.PositiveInfinity, false);
+            return new IKResult(0, float.PositiveInfinity, false);
 
         int n = chain.JointCount;
         if (positions == null || positions.Length != n)
             positions = chain.GetPositions();
 
         // Use the single BounceDepth for the scene
-        int bounceDepth = BounceDepth;
+        int frameDepth = bounceDepth;
 
         // Ensure bounceDepth is in valid range
-        bounceDepth = Mathf.Clamp(bounceDepth, 0, n - 2);
+        frameDepth = Mathf.Clamp(frameDepth, 0, n - 2);
 
         // Convert UnityEngine.Vector2[] to Utility.Vector2[] for calculations
         Utility.Vector2[] uPos = new Utility.Vector2[n];
@@ -50,7 +50,7 @@ public class CCDSolver
             // bounceDepth = 0: start at joint (n-2), process 1 joint
             // bounceDepth = 1: start at joint (n-3), process 2 joints
             // bounceDepth = k: start at joint (n-2-k), process (k+1) joints
-            int startJoint = n - 2 - bounceDepth;
+            int startJoint = n - 2 - frameDepth;
 
             // Ensure we don't go below root (joint 0)
             startJoint = Mathf.Max(0, startJoint);
@@ -85,8 +85,8 @@ public class CCDSolver
 
         // Update bounce depth for next call (cycles from 0 to n-2)
         int maxBounceDepth = Mathf.Max(0, n - 2);
-        BounceDepth = bounceDepth + 1 > maxBounceDepth ? 0 : bounceDepth + 1;
+        this.bounceDepth = frameDepth + 1 > maxBounceDepth ? 0 : frameDepth + 1;
 
-        return new IKResult2D(iterations, error, error <= settings.Epsilon);
+        return new IKResult(iterations, error, error <= settings.Epsilon);
     }
 }

@@ -6,7 +6,7 @@ public sealed class IKController : MonoBehaviour
     [Header("References")] [SerializeField]
     private Chain chain;
 
-    [SerializeField] private Transform target;
+    [field: SerializeField] public Transform Target { get; set; }
 
     [Tooltip(
         "Optional: if assigned, end-effector will be moved using Rigidbody2D.MovePosition for stable trigger physics")]
@@ -19,8 +19,6 @@ public sealed class IKController : MonoBehaviour
     private int maxIterations = 12;
 
     [Min(0.0001f)] [SerializeField] private float epsilon = 0.02f;
-
-    [Header("Runtime (read-only)")] private IKResult2D lastResult;
 
     private readonly CCDSolver ccdSolver = new();
 
@@ -44,43 +42,41 @@ public sealed class IKController : MonoBehaviour
         set => epsilon = Mathf.Max(0.0001f, value);
     }
 
-    public IKResult2D LastResult => lastResult;
+    [field: Header("Runtime (read-only)")] public IKResult LastResult { get; private set; }
 
     private void Awake()
     {
-        if (chain != null)
-            chain.Rebuild();
+        chain.Rebuild();
 
         positions = null;
     }
 
     private void FixedUpdate()
     {
-        if (chain == null || target == null) return;
         if (!chain.IsValid()) return;
 
         // Rebuild if the user repositions joints at runtime
         if (chain.SegmentCount > 0 && chain.TotalLength <= 0.0001f)
             chain.Rebuild();
 
-        var settings = new IKSettings2D
+        var settings = new IKSettings
         {
             MaxIterations = maxIterations,
             Epsilon = epsilon
         };
 
-        Vector2 tar = target.position;
+        Vector2 tar = Target.position;
 
         // We work by positions in world space (without hierarchy)
         positions = chain.GetPositions();
 
         // Solve based on selected algorithm
         // Each solver manages its own internal state if needed
-        lastResult = algorithm switch
+        LastResult = algorithm switch
         {
             IKAlgorithm.FABRIK => FabrikSolver.Solve(chain, tar, settings, ref positions),
             IKAlgorithm.CCD => ccdSolver.Solve(chain, tar, settings, ref positions),
-            _ => lastResult
+            _ => LastResult
         };
 
         // Apply positions to transforms

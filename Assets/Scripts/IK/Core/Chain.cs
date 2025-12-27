@@ -76,13 +76,4 @@ public sealed class Chain : MonoBehaviour
         for (int i = 0; i < JointCount; i++)
             joints[i].position = positions[i];
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        // In the editor, it recalculates when you touch something
-        if (joints != null && joints.Length >= 2)
-            Rebuild();
-    }
-#endif
 }

@@ -4,19 +4,19 @@ public enum IKAlgorithm
     CCD
 }
 
-public struct IKSettings2D
+public struct IKSettings
 {
     public int MaxIterations;
     public float Epsilon;
 }
 
-public struct IKResult2D
+public struct IKResult
 {
     public readonly int IterationsUsed;
     public readonly float FinalError;
     public readonly bool Reached;
 
-    public IKResult2D(int it, float err, bool reachedTarget)
+    public IKResult(int it, float err, bool reachedTarget)
     {
         IterationsUsed = it;
         FinalError = err;
