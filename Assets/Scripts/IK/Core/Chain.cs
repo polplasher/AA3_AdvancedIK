@@ -1,48 +1,45 @@
+using Unity.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public sealed class Chain2D : MonoBehaviour
+public sealed class Chain : MonoBehaviour
 {
-    [Header("Chain")]
-    [Tooltip("Joints in order from root (0) to end-effector (n-1). No parenting required")]
-    [SerializeField] private Transform[] joints;
+    [Header("Chain"), SerializeField] private Transform[] joints;
 
-    [Header("Computed (read-only)")]
-    [SerializeField] private float[] _lengths;
-    [SerializeField] private float _totalLength;
+    [Header("Computed (read-only)"), ReadOnly, SerializeField]
+    private float[] lengths;
+
+    [ReadOnly, SerializeField] private float totalLength;
 
     public Transform[] Joints => joints;
-    public int JointCount => joints != null ? joints.Length : 0;
+    public int JointCount => joints?.Length ?? 0;
     public int SegmentCount => Mathf.Max(0, JointCount - 1);
-    public float TotalLength => _totalLength;
+    public float TotalLength => totalLength;
 
-    public bool IsValid(out string error)
+    public bool IsValid()
     {
         if (joints == null || joints.Length < 2)
         {
-            error = "Chain2D: Need at least 2 joints";
             return false;
         }
 
-        for (int i = 0; i < joints.Length; i++)
+        foreach (Transform t in joints)
         {
-            if (joints[i] == null)
+            if (!t)
             {
-                error = $"Chain2D: Joint at index {i} is null";
                 return false;
             }
         }
 
-        error = string.Empty;
         return true;
     }
 
     public void Rebuild()
     {
-        if (!IsValid(out _)) return;
+        if (!IsValid()) return;
 
-        _lengths = new float[SegmentCount];
-        _totalLength = 0f;
+        lengths = new float[SegmentCount];
+        totalLength = 0f;
 
         for (int i = 0; i < SegmentCount; i++)
         {
@@ -50,16 +47,16 @@ public sealed class Chain2D : MonoBehaviour
             // Avoid 0 lengths that break IK
             len = Mathf.Max(0.0001f, len);
 
-            _lengths[i] = len;
-            _totalLength += len;
+            lengths[i] = len;
+            totalLength += len;
         }
     }
 
     public float GetLength(int segmentIndex)
     {
-        if (_lengths == null || segmentIndex < 0 || segmentIndex >= _lengths.Length)
+        if (lengths == null || segmentIndex < 0 || segmentIndex >= lengths.Length)
             return 0f;
-        return _lengths[segmentIndex];
+        return lengths[segmentIndex];
     }
 
     public Vector2[] GetPositions()

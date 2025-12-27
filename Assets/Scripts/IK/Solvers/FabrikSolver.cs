@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public static class FabrikSolver2D
+public static class FabrikSolver
 {
-    public static IKResult2D Solve(Chain2D chain, Vector2 target, IKSettings2D settings, ref Vector2[] positions)
+    public static IKResult2D Solve(Chain chain, Vector2 target, IKSettings2D settings, ref Vector2[] positions)
     {
-        if (!chain.IsValid(out _))
+        if (!chain.IsValid())
             return new IKResult2D(0, float.PositiveInfinity, false);
 
         int n = chain.JointCount;
@@ -25,13 +25,13 @@ public static class FabrikSolver2D
             }
 
             float err = Vector2.Distance(positions[n - 1], target);
-            return new IKResult2D(1, err, err <= settings.epsilon);
+            return new IKResult2D(1, err, err <= settings.Epsilon);
         }
 
         int iterations = 0;
         float error = Vector2.Distance(positions[n - 1], target);
 
-        while (iterations < settings.maxIterations && error > settings.epsilon)
+        while (iterations < settings.MaxIterations && error > settings.Epsilon)
         {
             iterations++;
 
@@ -56,6 +56,6 @@ public static class FabrikSolver2D
             error = Vector2.Distance(positions[n - 1], target);
         }
 
-        return new IKResult2D(iterations, error, error <= settings.epsilon);
+        return new IKResult2D(iterations, error, error <= settings.Epsilon);
     }
 }

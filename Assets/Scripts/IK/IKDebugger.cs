@@ -2,10 +2,10 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public sealed class IKDebugUI2D : MonoBehaviour
+public sealed class IKDebugger : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private IKController2D controller;
+    [SerializeField] private IKController controller;
 
     [Header("UI")]
     [SerializeField] private TMP_Dropdown algorithmDropdown;
@@ -21,7 +21,7 @@ public sealed class IKDebugUI2D : MonoBehaviour
         {
             algorithmDropdown.ClearOptions();
             algorithmDropdown.AddOptions(new System.Collections.Generic.List<string> { "FABRIK", "CCD" });
-            algorithmDropdown.value = controller.Algorithm == IKAlgorithm2D.FABRIK ? 0 : 1;
+            algorithmDropdown.value = controller.Algorithm == IKAlgorithm.FABRIK ? 0 : 1;
             algorithmDropdown.onValueChanged.AddListener(OnAlgorithmChanged);
         }
 
@@ -51,14 +51,14 @@ public sealed class IKDebugUI2D : MonoBehaviour
             $"Algorithm: {controller.Algorithm}\n" +
             $"MaxIter: {controller.MaxIterations}\n" +
             $"Epsilon: {controller.Epsilon:0.0000}\n" +
-            $"IterUsed: {r.iterationsUsed}\n" +
-            $"Error: {r.finalError:0.0000}\n" +
-            $"Reached: {r.reached}";
+            $"IterUsed: {r.IterationsUsed}\n" +
+            $"Error: {r.FinalError:0.0000}\n" +
+            $"Reached: {r.Reached}";
     }
 
     private void OnAlgorithmChanged(int v)
     {
         if (controller == null) return;
-        controller.Algorithm = (v == 0) ? IKAlgorithm2D.FABRIK : IKAlgorithm2D.CCD;
+        controller.Algorithm = v == 0 ? IKAlgorithm.FABRIK : IKAlgorithm.CCD;
     }
 }

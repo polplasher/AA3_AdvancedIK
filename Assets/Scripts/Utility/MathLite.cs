@@ -17,5 +17,32 @@ namespace Utility
         public static float Deg2Rad(float deg) => deg * (PI / 180f);
         public static float Rad2Deg(float rad) => rad * (180f / PI);
         public static float Atan2(float y, float x) => (float)System.Math.Atan2(y, x);
+
+        // Rotate point around pivot by radians (counter-clockwise positive)
+        public static Vector2 RotateAround(Vector2 point, Vector2 pivot, float radians)
+        {
+            float s = Sin(radians);
+            float c = Cos(radians);
+            Vector2 p = point - pivot;
+            Vector2 pr = new(p.x * c - p.y * s, p.x * s + p.y * c);
+            return new Vector2(pivot.x + pr.x, pivot.y + pr.y);
+        }
+
+        // Signed angle in radians between two 2D vectors (from -> to), range [-PI, PI]
+        public static float SignedAngleRad(Vector2 from, Vector2 to)
+        {
+            float magFrom = Sqrt(from.x * from.x + from.y * from.y);
+            float magTo = Sqrt(to.x * to.x + to.y * to.y);
+            const float eps = 1e-6f;
+            if (magFrom < eps || magTo < eps)
+                return 0f;
+
+            Vector2 fn = new(from.x / magFrom, from.y / magFrom);
+            Vector2 tn = new(to.x / magTo, to.y / magTo);
+
+            float cross = fn.x * tn.y - fn.y * tn.x;
+            float dot = fn.x * tn.x + fn.y * tn.y;
+            return Atan2(cross, dot);
+        }
     }
 }

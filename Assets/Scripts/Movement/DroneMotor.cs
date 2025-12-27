@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public sealed class DroneMotor2D : MonoBehaviour
+public sealed class DroneMotor : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float maxSpeed = 6f;
@@ -11,21 +11,21 @@ public sealed class DroneMotor2D : MonoBehaviour
     [Header("Physics")]
     [SerializeField] private float linearDragWhenNoInput = 6f;
 
-    private Rigidbody2D _rb;
+    private Rigidbody2D rb;
 
     private void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        _rb.gravityScale = 0f;
-        _rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0f;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
 
     private void FixedUpdate()
     {
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        Vector2 input = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         input = Vector2.ClampMagnitude(input, 1f);
 
-        Vector2 v = _rb.linearVelocity;
+        Vector2 v = rb.linearVelocity;
 
         if (input.sqrMagnitude > 0.0001f)
         {
@@ -36,7 +36,7 @@ public sealed class DroneMotor2D : MonoBehaviour
             Vector2 accel = Vector2.ClampMagnitude(delta, acceleration * Time.fixedDeltaTime);
             v += accel;
 
-            _rb.linearDamping = 0f;
+            rb.linearDamping = 0f;
         }
         else
         {
@@ -44,11 +44,11 @@ public sealed class DroneMotor2D : MonoBehaviour
             float speed = v.magnitude;
             float drop = deceleration * Time.fixedDeltaTime;
             speed = Mathf.Max(0f, speed - drop);
-            v = (v.sqrMagnitude > 0.0001f) ? v.normalized * speed : Vector2.zero;
+            v = v.sqrMagnitude > 0.0001f ? v.normalized * speed : Vector2.zero;
 
-            _rb.linearDamping = linearDragWhenNoInput;
+            rb.linearDamping = linearDragWhenNoInput;
         }
 
-        _rb.linearVelocity = Vector2.ClampMagnitude(v, maxSpeed);
+        rb.linearVelocity = Vector2.ClampMagnitude(v, maxSpeed);
     }
 }

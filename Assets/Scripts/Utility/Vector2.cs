@@ -12,10 +12,10 @@
             this.y = y;
         }
 
-        public static Vector2 Zero => new Vector2(0f, 0f);
-        public static Vector2 One => new Vector2(1f, 1f);
-        public static Vector2 Up => new Vector2(0f, 1f);
-        public static Vector2 Right => new Vector2(1f, 0f);
+        public static Vector2 Zero => new(0f, 0f);
+        public static Vector2 One => new(1f, 1f);
+        public static Vector2 Up => new(0f, 1f);
+        public static Vector2 Right => new(1f, 0f);
 
         public float sqrMagnitude => x * x + y * y;
         public float magnitude => MathLite.Sqrt(sqrMagnitude);
@@ -60,12 +60,12 @@
         }
 
         // Operators
-        public static Vector2 operator +(Vector2 a, Vector2 b) => new Vector2(a.x + b.x, a.y + b.y);
-        public static Vector2 operator -(Vector2 a, Vector2 b) => new Vector2(a.x - b.x, a.y - b.y);
-        public static Vector2 operator -(Vector2 a) => new Vector2(-a.x, -a.y);
-        public static Vector2 operator *(Vector2 a, float s) => new Vector2(a.x * s, a.y * s);
+        public static Vector2 operator +(Vector2 a, Vector2 b) => new(a.x + b.x, a.y + b.y);
+        public static Vector2 operator -(Vector2 a, Vector2 b) => new(a.x - b.x, a.y - b.y);
+        public static Vector2 operator -(Vector2 a) => new(-a.x, -a.y);
+        public static Vector2 operator *(Vector2 a, float s) => new(a.x * s, a.y * s);
         public static Vector2 operator *(float s, Vector2 a) => a * s;
-        public static Vector2 operator /(Vector2 a, float s) => new Vector2(a.x / s, a.y / s);
+        public static Vector2 operator /(Vector2 a, float s) => new(a.x / s, a.y / s);
 
         public override string ToString() => "(" + x + ", " + y + ")";
     }
