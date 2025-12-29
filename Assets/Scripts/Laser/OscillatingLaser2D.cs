@@ -1,4 +1,5 @@
 using UnityEngine;
+using Utility;
 
 using UVec2 = UnityEngine.Vector2;
 using UVec3 = UnityEngine.Vector3;
@@ -90,11 +91,5 @@ namespace Lasers
         }
 
         public void SetPhaseSeconds(float seconds) => phaseOffsetSeconds = seconds;
-    }
-
-    internal static class Vector2Conversions
-    {
-        public static Utility.Vector2 ToUtility(this UVec2 v) => new Utility.Vector2(v.x, v.y);
-        public static UVec2 ToUnity(this Utility.Vector2 v) => new UVec2(v.x, v.y);
     }
 }
