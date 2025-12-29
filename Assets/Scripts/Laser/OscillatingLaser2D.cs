@@ -2,6 +2,7 @@ using UnityEngine;
 
 using UVec2 = UnityEngine.Vector2;
 using UVec3 = UnityEngine.Vector3;
+using Math = Utility.MathLite;
 
 namespace Lasers
 {
@@ -38,7 +39,7 @@ namespace Lasers
         {
             //calcula el angulo oscilante
             float t = Time.time + phaseOffsetSeconds;
-            float angleDeg = baseAngleDeg + Mathf.Sin(t * Mathf.PI * 2f * frequencyHz) * amplitudeDeg;
+            float angleDeg = baseAngleDeg + Math.Sin(t * Math.PI * 2f * frequencyHz) * amplitudeDeg;
 
             Utility.Vector2 baseDirUtility = localBaseDir.ToUtility().normalized;
             Utility.Vector2 dirLocalUtility = RotateDeg(baseDirUtility, angleDeg);
@@ -78,9 +79,9 @@ namespace Lasers
 
         private static Utility.Vector2 RotateDeg(Utility.Vector2 v, float degrees)
         {
-            float rad = degrees * Mathf.Deg2Rad;
-            float cos = Mathf.Cos(rad);
-            float sin = Mathf.Sin(rad);
+            float rad = degrees * Math.Deg2Rad;
+            float cos = Math.Cos(rad);
+            float sin = Math.Sin(rad);
 
             return new Utility.Vector2(
                 v.x * cos - v.y * sin,

@@ -1,4 +1,6 @@
 using UnityEngine;
+using Vec2 = Utility.Vector2;
+using Math = Utility.MathLite;
 
 [DisallowMultipleComponent]
 public sealed class IKController : MonoBehaviour
@@ -16,18 +18,18 @@ public sealed class IKController : MonoBehaviour
     private Rigidbody2D endEffectorBody;
 
     private readonly CCDSolver ccdSolver = new();
-    private Vector2[] positions;
+    private Vec2[] positions;
 
     public int MaxIterations
     {
         get => maxIterations;
-        set => maxIterations = Mathf.Max(1, value);
+        set => maxIterations = Math.Max(1, value);
     }
 
     public float Epsilon
     {
         get => epsilon;
-        set => epsilon = Mathf.Max(0.0001f, value);
+        set => epsilon = Math.Max(0.0001f, value);
     }
 
     public IKResult LastResult { get; private set; }
@@ -53,7 +55,8 @@ public sealed class IKController : MonoBehaviour
             Epsilon = epsilon
         };
 
-        Vector2 tar = Target.position;
+        Vector3 tp = Target.position;
+        Vec2 tar = new(tp.x, tp.y);
 
         // We work by positions in world space (without hierarchy)
         positions = chain.GetPositions();
@@ -73,12 +76,15 @@ public sealed class IKController : MonoBehaviour
         {
             int end = chain.JointCount - 1;
 
-            // Set joints except the effector
+            // Set joints except the effector (keep Z)
             for (int i = 0; i < end; i++)
-                chain.Joints[i].position = positions[i];
+            {
+                Vector3 cur = chain.Joints[i].position;
+                chain.Joints[i].position = new Vector3(positions[i].x, positions[i].y, cur.z);
+            }
 
-            // Effector by physics
-            endEffectorBody.MovePosition(positions[end]);
+            // Effector by physics (XY only)
+            endEffectorBody.MovePosition(new UnityEngine.Vector2(positions[end].x, positions[end].y));
         }
         else
         {

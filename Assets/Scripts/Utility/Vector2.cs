@@ -12,10 +12,16 @@
             this.y = y;
         }
 
+        // Unity-ish aliases (so porting is mostly search/replace)
         public static Vector2 Zero => new(0f, 0f);
         public static Vector2 One => new(1f, 1f);
         public static Vector2 Up => new(0f, 1f);
         public static Vector2 Right => new(1f, 0f);
+
+        public static Vector2 zero => Zero;
+        public static Vector2 one => One;
+        public static Vector2 up => Up;
+        public static Vector2 right => Right;
 
         public float sqrMagnitude => x * x + y * y;
         public float magnitude => MathLite.Sqrt(sqrMagnitude);
@@ -47,6 +53,18 @@
             return MathLite.Sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
         }
 
+        public static Vector2 ClampMagnitude(Vector2 v, float maxLength)
+        {
+            float sq = v.sqrMagnitude;
+            float maxSq = maxLength * maxLength;
+            if (sq > maxSq && sq > 1e-12f)
+            {
+                float m = MathLite.Sqrt(sq);
+                return v / m * maxLength;
+            }
+            return v;
+        }
+
         // Return angle in radians from +X to the vector (like atan2)
         public float AngleRad()
         {
@@ -56,7 +74,7 @@
         // Angle in degrees
         public float AngleDeg()
         {
-            return MathLite.Rad2Deg(AngleRad());
+            return AngleRad() * MathLite.Rad2Deg;
         }
 
         // Operators

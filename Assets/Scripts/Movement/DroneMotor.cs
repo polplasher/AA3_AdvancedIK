@@ -1,4 +1,7 @@
 using UnityEngine;
+using Utility;
+using Vec2 = Utility.Vector2;
+using Math = Utility.MathLite;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class DroneMotor : MonoBehaviour
@@ -22,18 +25,18 @@ public sealed class DroneMotor : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 input = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        input = Vector2.ClampMagnitude(input, 1f);
+        Vec2 input = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        input = Vec2.ClampMagnitude(input, 1f);
 
-        Vector2 v = rb.linearVelocity;
+        Vec2 v = rb.linearVelocity.ToUtility();
 
         if (input.sqrMagnitude > 0.0001f)
         {
             // Accelerate towards target speed
-            Vector2 desired = input * maxSpeed;
-            Vector2 delta = desired - v;
+            Vec2 desired = input * maxSpeed;
+            Vec2 delta = desired - v;
 
-            Vector2 accel = Vector2.ClampMagnitude(delta, acceleration * Time.fixedDeltaTime);
+            Vec2 accel = Vec2.ClampMagnitude(delta, acceleration * Time.fixedDeltaTime);
             v += accel;
 
             rb.linearDamping = 0f;
@@ -43,12 +46,12 @@ public sealed class DroneMotor : MonoBehaviour
             // Smooth braking
             float speed = v.magnitude;
             float drop = deceleration * Time.fixedDeltaTime;
-            speed = Mathf.Max(0f, speed - drop);
-            v = v.sqrMagnitude > 0.0001f ? v.normalized * speed : Vector2.zero;
+            speed = Math.Max(0f, speed - drop);
+            v = v.sqrMagnitude > 0.0001f ? v.normalized * speed : Vec2.zero;
 
             rb.linearDamping = linearDragWhenNoInput;
         }
 
-        rb.linearVelocity = Vector2.ClampMagnitude(v, maxSpeed);
+        rb.linearVelocity = Vec2.ClampMagnitude(v, maxSpeed).ToUnity();
     }
 }

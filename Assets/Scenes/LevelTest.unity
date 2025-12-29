@@ -2026,11 +2026,6 @@ MonoBehaviour:
   - {fileID: 204398197}
   - {fileID: 1750980849}
   - {fileID: 1767219393}
-  lengths:
-  - 1.6574639
-  - 1.4062415
-  - 1.42
-  totalLength: 4.4837055
 --- !u!4 &1331163178
 Transform:
   m_ObjectHideFlags: 0
@@ -2058,12 +2053,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d910499b8d4988408cb3bbc886e53c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chain: {fileID: 1331163177}
-  target: {fileID: 1245103847}
-  endEffectorBody: {fileID: 1767219394}
   algorithm: 0
   maxIterations: 12
   epsilon: 0.02
+  chain: {fileID: 1331163177}
+  <Target>k__BackingField: {fileID: 1245103847}
+  endEffectorBody: {fileID: 1767219394}
 --- !u!114 &1331163180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3608,11 +3603,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0efe5ed64f5faab49b6880aae497b909, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 1331163179}
-  algorithmDropdown: {fileID: 1240895499}
+  algorithmText: {fileID: 0}
+  iterationsText: {fileID: 0}
   iterationsSlider: {fileID: 1878006514}
+  epsilonText: {fileID: 0}
   epsilonSlider: {fileID: 166596339}
   infoText: {fileID: 692587438}
+  controller: {fileID: 1331163179}
 --- !u!114 &1983796940
 MonoBehaviour:
   m_ObjectHideFlags: 0

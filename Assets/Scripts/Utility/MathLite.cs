@@ -3,10 +3,20 @@ namespace Utility
     public static class MathLite
     {
         public const float PI = 3.14159265358979323846f;
+
+        // Match Unity-style constants for convenient porting
+        public const float Deg2Rad = PI / 180f;
+        public const float Rad2Deg = 180f / PI;
+
         public static float Sin(float a) => (float)System.Math.Sin(a);
         public static float Cos(float a) => (float)System.Math.Cos(a);
         public static float Sqrt(float a) => (float)System.Math.Sqrt(a);
         public static float Abs(float a) => System.Math.Abs(a);
+
+        public static float Max(float a, float b) => a > b ? a : b;
+        public static float Min(float a, float b) => a < b ? a : b;
+        public static int Max(int a, int b) => a > b ? a : b;
+        public static int Min(int a, int b) => a < b ? a : b;
 
         public static float Clamp(float v, float min, float max)
         {
@@ -14,8 +24,24 @@ namespace Utility
             return v > max ? max : v;
         }
 
-        public static float Deg2Rad(float deg) => deg * (PI / 180f);
-        public static float Rad2Deg(float rad) => rad * (180f / PI);
+        public static int Clamp(int v, int min, int max)
+        {
+            if (v < min) return min;
+            return v > max ? max : v;
+        }
+
+        public static float Clamp01(float v) => Clamp(v, 0f, 1f);
+
+        /// <summary>
+        /// Unity-like rounding: ties go away from zero (unlike default System.Math.Round).
+        /// </summary>
+        public static int RoundToInt(float v)
+        {
+            return v >= 0f
+                ? (int)System.Math.Floor(v + 0.5f)
+                : (int)System.Math.Ceiling(v - 0.5f);
+        }
+
         public static float Atan2(float y, float x) => (float)System.Math.Atan2(y, x);
 
         // Rotate point around pivot by radians (counter-clockwise positive)

@@ -1,4 +1,6 @@
 using UnityEngine;
+using Vec2 = Utility.Vector2;
+using Math = Utility.MathLite;
 
 [DisallowMultipleComponent]
 public sealed class Chain : MonoBehaviour
@@ -7,7 +9,7 @@ public sealed class Chain : MonoBehaviour
 
     public Transform[] Joints => joints;
     public int JointCount => joints?.Length ?? 0;
-    public int SegmentCount => Mathf.Max(0, JointCount - 1);
+    public int SegmentCount => Math.Max(0, JointCount - 1);
     public float TotalLength { get; private set; }
 
     private float[] lengths;
@@ -39,9 +41,13 @@ public sealed class Chain : MonoBehaviour
 
         for (int i = 0; i < SegmentCount; i++)
         {
-            float len = Vector2.Distance(joints[i].position, joints[i + 1].position);
+            // We only use XY for IK math
+            Vector3 a = joints[i].position;
+            Vector3 b = joints[i + 1].position;
+
+            float len = Vec2.Distance(new Vec2(a.x, a.y), new Vec2(b.x, b.y));
             // Avoid 0 lengths that break IK
-            len = Mathf.Max(0.0001f, len);
+            len = Math.Max(0.0001f, len);
 
             lengths[i] = len;
             TotalLength += len;
@@ -55,21 +61,27 @@ public sealed class Chain : MonoBehaviour
         return lengths[segmentIndex];
     }
 
-    public Vector2[] GetPositions()
+    public Vec2[] GetPositions()
     {
-        var pos = new Vector2[JointCount];
+        var pos = new Vec2[JointCount];
         for (int i = 0; i < JointCount; i++)
-            pos[i] = joints[i].position;
+        {
+            Vector3 p = joints[i].position;
+            pos[i] = new Vec2(p.x, p.y);
+        }
         return pos;
     }
 
-    public void SetPositions(Vector2[] positions)
+    public void SetPositions(Vec2[] positions)
     {
         if (positions == null || positions.Length != JointCount) return;
 
         // Important: We do NOT depend on a parent-child hierarchy
         // Each joint is an independent Transform in world space
         for (int i = 0; i < JointCount; i++)
-            joints[i].position = positions[i];
+        {
+            Vector3 cur = joints[i].position; // keep Z as-is
+            joints[i].position = new Vector3(positions[i].x, positions[i].y, cur.z);
+        }
     }
 }
