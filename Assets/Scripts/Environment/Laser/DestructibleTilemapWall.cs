@@ -17,7 +17,7 @@ public class DestructibleTilemapWall : MonoBehaviour
     {
         tilemap = GetComponent<Tilemap>();
 
-        if (compositeToRebuild == null)
+        if (!compositeToRebuild)
             compositeToRebuild = GetComponent<CompositeCollider2D>();
 
         if (debugLogs)

@@ -1,6 +1,5 @@
 using UnityEngine;
 using Utility;
-
 using UVec2 = UnityEngine.Vector2;
 using UVec3 = UnityEngine.Vector3;
 using Math = Utility.MathLite;
@@ -9,29 +8,27 @@ namespace Lasers
 {
     public class OscillatingLaser2D : MonoBehaviour
     {
-        [Header("Laser")]
-        [SerializeField] private float maxDistance = 20f;
-        [SerializeField] private LayerMask hitMask;       
+        [Header("Laser")] [SerializeField] private float maxDistance = 20f;
+        [SerializeField] private LayerMask hitMask;
         [SerializeField] private bool hitTriggers = false;
-        [SerializeField] private float lineZ = 0f;         
-        [SerializeField] private string armTag = "PlayerArm"; 
+        [SerializeField] private float lineZ = 0f;
+        [SerializeField] private string armTag = "PlayerArm";
 
-        [Header("Oscillation (degrees)")]
-        [SerializeField] private float baseAngleDeg = 0f;
+        [Header("Oscillation (degrees)")] [SerializeField]
+        private float baseAngleDeg = 0f;
+
         [SerializeField] private float amplitudeDeg = 35f;
         [SerializeField] private float frequencyHz = 0.5f;
         [SerializeField] private float phaseOffsetSeconds = 0f;
 
-        [Header("Direction (Inspector uses UnityEngine.Vector2)")]
-        [SerializeField] private UVec2 localBaseDir = UVec2.right;
+        [Header("Direction (Inspector uses UnityEngine.Vector2)")] [SerializeField]
+        private UVec2 localBaseDir = UVec2.right;
 
         private LineRenderer lr;
 
         private void Awake()
         {
             lr = GetComponent<LineRenderer>();
-            if (lr == null) lr = gameObject.AddComponent<LineRenderer>();
-
             lr.positionCount = 2;
             lr.useWorldSpace = true;
         }
@@ -46,9 +43,9 @@ namespace Lasers
             Utility.Vector2 dirLocalUtility = RotateDeg(baseDirUtility, angleDeg);
 
             UVec2 dirLocalUnity = dirLocalUtility.ToUnity().normalized;
-            UVec2 dirWorldUnity = (UVec2)transform.TransformDirection(dirLocalUnity);
+            UVec2 dirWorldUnity = transform.TransformDirection(dirLocalUnity);
 
-            UVec2 start = (UVec2)transform.position;
+            UVec2 start = transform.position;
             UVec2 end = start + dirWorldUnity * maxDistance;
 
             var filter = new ContactFilter2D
@@ -61,17 +58,17 @@ namespace Lasers
             RaycastHit2D[] hits = new RaycastHit2D[1];
             int count = Physics2D.Raycast(start, dirWorldUnity, filter, hits, maxDistance);
 
-            if (count > 0 && hits[0].collider != null)
+            if (count > 0 && hits[0].collider)
             {
                 end = hits[0].point;
 
                 if (hits[0].collider.gameObject.layer == LayerMask.NameToLayer("LaserBlocker"))
                 {
-                    var destructible = hits[0].collider.GetComponentInParent<DestructibleTilemapWall>();
-                    if (destructible != null)
-                        destructible.CarveHoleAtHit(hits[0].point, 1); 
+                    DestructibleTilemapWall destructible =
+                        hits[0].collider.GetComponentInParent<DestructibleTilemapWall>();
+                    if (destructible)
+                        destructible.CarveHoleAtHit(hits[0].point, 1);
                 }
-
             }
 
             lr.SetPosition(0, new UVec3(start.x, start.y, lineZ));
@@ -89,7 +86,5 @@ namespace Lasers
                 v.x * sin + v.y * cos
             );
         }
-
-        public void SetPhaseSeconds(float seconds) => phaseOffsetSeconds = seconds;
     }
 }

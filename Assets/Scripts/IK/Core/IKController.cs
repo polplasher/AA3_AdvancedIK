@@ -17,7 +17,6 @@ public sealed class IKController : MonoBehaviour
     [SerializeField]
     private Rigidbody2D endEffectorBody;
 
-    private readonly CCDSolver ccdSolver = new();
     private Vec2[] positions;
 
     public int MaxIterations
@@ -84,7 +83,7 @@ public sealed class IKController : MonoBehaviour
             }
 
             // Effector by physics (XY only)
-            endEffectorBody.MovePosition(new UnityEngine.Vector2(positions[end].x, positions[end].y));
+            endEffectorBody.MovePosition(new Vector2(positions[end].x, positions[end].y));
         }
         else
         {
