@@ -45,11 +45,16 @@ public static class FabrikSolver
             {
                 float linkLength = chain.GetLength(i);
                 float currentDistance = Vec2.Distance(positions[i], positions[i + 1]);
+                
+                // Safety check: if joints are too close, skip
+                if (currentDistance < 0.0001f)
+                    continue;
+                
                 float lambda = linkLength / currentDistance;
                 
                 // Adjust position to maintain link length
                 // position[i] = position[i] + (1 - lambda) * (position[i+1] - position[i])
-                positions[i] += (1 - lambda) * (positions[i + 1] - positions[i]);
+                positions[i] = positions[i] + (1 - lambda) * (positions[i + 1] - positions[i]);
             }
 
             // Backward pass
@@ -58,11 +63,15 @@ public static class FabrikSolver
             {
                 float linkLength = chain.GetLength(i - 1);
                 float currentDistance = Vec2.Distance(positions[i - 1], positions[i]);
+                
+                // Safety check: if joints are too close, skip
+                if (currentDistance < 0.0001f)
+                    continue;
                 float lambda = linkLength / currentDistance;
                 
                 // Adjust position to maintain link length
                 // position[i] = position[i] + (1 - lambda) * (position[i-1] - position[i])
-                positions[i] += (1 - lambda) * (positions[i - 1] - positions[i]);
+                positions[i] = positions[i] + (1 - lambda) * (positions[i - 1] - positions[i]);
             }
 
             error = Vec2.Distance(positions[n - 1], target);
