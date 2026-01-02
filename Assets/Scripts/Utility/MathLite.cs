@@ -10,6 +10,7 @@ namespace Utility
 
         public static float Sin(float a) => (float)System.Math.Sin(a);
         public static float Cos(float a) => (float)System.Math.Cos(a);
+        public static float Acos(float a) => (float)System.Math.Acos(a);
         public static float Sqrt(float a) => (float)System.Math.Sqrt(a);
         public static float Abs(float a) => System.Math.Abs(a);
 

@@ -66,7 +66,7 @@ public sealed class IKController : MonoBehaviour
         LastResult = algorithm switch
         {
             IKAlgorithm.FABRIK => FabrikSolver.Solve(chain, tar, settings, ref positions),
-            IKAlgorithm.CCD => ccdSolver.Solve(chain, tar, settings, ref positions),
+            IKAlgorithm.CCD => CCDSolver.Solve(chain, tar, settings, ref positions),
             _ => LastResult
         };
 

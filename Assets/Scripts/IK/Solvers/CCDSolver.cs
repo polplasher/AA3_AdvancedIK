@@ -4,21 +4,10 @@ using Math = Utility.MathLite;
 public class CCDSolver
 {
     /// <summary>
-    /// Internal bounce depth for the single CCD chain in the scene.
+    /// CCD solver implementation.
+    /// Processes joints from end to root, rotating each joint to point the end effector toward the target.
     /// </summary>
-    private int bounceDepth;
-
-    /// <summary>
-    /// CCD solver with bounce mechanism - progressively processes joints in a cycling pattern.
-    /// 
-    /// This variant implements a "bouncing" iteration strategy where instead of processing
-    /// all joints in every iteration, it cycles through progressively larger subsets:
-    /// - Call 1: Process only the end-most joint
-    /// - Call 2: Process the last 2 joints
-    /// - Call 3: Process the last 3 joints
-    /// - ...and so on until all joints are processed, then the cycle repeats
-    /// </summary>
-    public IKResult Solve(Chain chain, Vec2 target, IKSettings settings, ref Vec2[] positions)
+    public static IKResult Solve(Chain chain, Vec2 target, IKSettings settings, ref Vec2[] positions)
     {
         if (!chain.IsValid())
             return new IKResult(0, float.PositiveInfinity, false);
@@ -27,12 +16,6 @@ public class CCDSolver
         if (positions == null || positions.Length != n)
             positions = chain.GetPositions();
 
-        // Use the single BounceDepth for the scene
-        int frameDepth = bounceDepth;
-
-        // Ensure bounceDepth is in valid range
-        frameDepth = Math.Clamp(frameDepth, 0, n - 2);
-
         int iterations = 0;
         float error = Vec2.Distance(positions[n - 1], target);
 
@@ -40,39 +23,39 @@ public class CCDSolver
         {
             iterations++;
 
-            // Calculate the starting joint index based on bounce depth
-            int startJoint = n - 2 - frameDepth;
-
-            // Ensure we don't go below root (joint 0)
-            startJoint = Math.Max(0, startJoint);
-
-            // Traverse joints from startJoint to the root in this bounce cycle
-            for (int i = startJoint; i >= 0; i--)
+            // Process joints from end to root
+            for (int jointIndex = n - 2; jointIndex >= 0; jointIndex--)
             {
-                Vec2 jointPos = positions[i];
-                Vec2 toEff = positions[n - 1] - jointPos;
-                Vec2 toTar = target - jointPos;
+                Vec2 currentJoint = positions[jointIndex];
 
-                float toEffMag = toEff.magnitude;
-                float toTarMag = toTar.magnitude;
+                // Get vectors from current joint to end effector and target
+                Vec2 toEndEffector = (positions[n - 1] - currentJoint).normalized;
+                Vec2 toTarget = (target - currentJoint).normalized;
 
-                if (toEffMag < 1e-6f || toTarMag < 1e-6f)
+                // Skip if vectors are too small
+                if (toEndEffector.magnitude < 1e-6f || toTarget.magnitude < 1e-6f)
                     continue;
 
-                // Signed angle in 2D (Z)
-                float angle = Math.SignedAngleRad(toEff, toTar);
+                // Calculate rotation angle
+                float dotProduct = Vec2.Dot(toEndEffector, toTarget);
+                dotProduct = Math.Clamp(dotProduct, -1.0f, 1.0f);
+                float angle = Math.Acos(dotProduct);
 
-                // Rotate all downstream points around joint i
-                for (int j = i + 1; j < n; j++)
-                    positions[j] = Math.RotateAround(positions[j], jointPos, angle);
+                // Determine rotation direction using cross product (in 2D, check Z component)
+                // In 2D: cross product Z = x1*y2 - y1*x2
+                float crossZ = toEndEffector.x * toTarget.y - toEndEffector.y * toTarget.x;
+                if (crossZ < 0)
+                    angle = -angle;
+
+                // Rotate all joints from current+1 to end effector around current joint
+                for (int i = jointIndex + 1; i < n; i++)
+                {
+                    positions[i] = Math.RotateAround(positions[i], currentJoint, angle);
+                }
             }
 
             error = Vec2.Distance(positions[n - 1], target);
         }
-
-        // Update bounce depth for next call (cycles from 0 to n-2)
-        int maxBounceDepth = Math.Max(0, n - 2);
-        bounceDepth = frameDepth + 1 > maxBounceDepth ? 0 : frameDepth + 1;
 
         return new IKResult(iterations, error, error <= settings.Epsilon);
     }
