@@ -50,7 +50,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   hitTriggers: 1
-  lineZ: 0
   armTag: PlayerArm
   baseAngleDeg: 0
   amplitudeDeg: 0
