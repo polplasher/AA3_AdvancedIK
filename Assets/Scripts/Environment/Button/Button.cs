@@ -7,6 +7,7 @@ public class Button : MonoBehaviour
 {
     [SerializeField] private float pressThreshold = 0.5f;
     [SerializeField] private UnityEvent onPressedUnityEvent;
+    [SerializeField] private bool needsToHold;
     public event Action OnPressed;
 
     private const string EffectorTag = "EndEffector";
@@ -19,6 +20,15 @@ public class Button : MonoBehaviour
 
     private void Update()
     {
+        if (needsToHold && !isPressing)
+        {
+            // reset if not holding
+            IsPressed = false;
+            pressTime = 0f;
+            spriteRenderer.color = Color.white;
+            return;
+        }
+
         if (IsPressed) return;
 
         if (isPressing)

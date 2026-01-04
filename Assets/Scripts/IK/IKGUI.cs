@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public sealed class IKGUI : MonoBehaviour
 {
-    [Header("UI"), SerializeField] private TextMeshProUGUI algorithmText;
-    [SerializeField] private TextMeshProUGUI iterationsText;
+    [Header("UI"), SerializeField] private TextMeshProUGUI iterationsText;
     [SerializeField] private Slider iterationsSlider;
     [SerializeField] private TextMeshProUGUI epsilonText;
     [SerializeField] private Slider epsilonSlider;
@@ -16,7 +15,6 @@ public sealed class IKGUI : MonoBehaviour
 
     private void Start()
     {
-        algorithmText.text = $"Algorithm: {controller.algorithm}";
         iterationsSlider.value = controller.MaxIterations;
         iterationsSlider.onValueChanged.AddListener(v => controller.MaxIterations = Mathf.RoundToInt(v));
 

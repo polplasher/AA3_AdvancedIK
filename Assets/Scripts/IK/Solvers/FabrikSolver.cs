@@ -16,22 +16,19 @@ public static class FabrikSolver
             positions = chain.GetPositions();
 
         Vec2 rootPos = positions[0];
-        float distRootToTarget = Vec2.Distance(rootPos, target);
 
         // Unreachable case: stretch towards the target
-        if (distRootToTarget > chain.TotalLength)
+        if (Vec2.Distance(rootPos, target) > chain.TotalLength)
         {
             for (int i = 0; i < n - 1; i++)
             {
-                float len = chain.GetLength(i);
                 Vec2 dir = (target - positions[i]).normalized;
-                positions[i + 1] = positions[i] + dir * len;
+                positions[i + 1] = positions[i] + dir * chain.GetLength(i);
             }
-
-            float err = Vec2.Distance(positions[n - 1], target);
-            return new IKResult(1, err, err <= settings.Epsilon);
+            return new IKResult(1, Vec2.Distance(positions[n - 1], target), false);
         }
 
+        // Main FABRIK loop
         int iterations = 0;
         float error = Vec2.Distance(positions[n - 1], target);
 
@@ -39,39 +36,20 @@ public static class FabrikSolver
         {
             iterations++;
 
-            // Forward pass
+            // Forward pass: from end effector to root
             positions[n - 1] = target;
             for (int i = n - 2; i >= 0; i--)
             {
-                float linkLength = chain.GetLength(i);
-                float currentDistance = Vec2.Distance(positions[i], positions[i + 1]);
-                
-                // Safety check: if joints are too close, skip
-                if (currentDistance < 0.0001f)
-                    continue;
-                
-                float lambda = linkLength / currentDistance;
-                
-                // Adjust position to maintain link length
-                // position[i] = position[i] + (1 - lambda) * (position[i+1] - position[i])
-                positions[i] = positions[i] + (1 - lambda) * (positions[i + 1] - positions[i]);
+                float lambda = chain.GetLength(i) / Vec2.Distance(positions[i], positions[i + 1]);
+                positions[i] += (1 - lambda) * (positions[i + 1] - positions[i]);
             }
 
-            // Backward pass
+            // Backward pass: from root to end effector
             positions[0] = rootPos;
             for (int i = 1; i < n; i++)
             {
-                float linkLength = chain.GetLength(i - 1);
-                float currentDistance = Vec2.Distance(positions[i - 1], positions[i]);
-                
-                // Safety check: if joints are too close, skip
-                if (currentDistance < 0.0001f)
-                    continue;
-                float lambda = linkLength / currentDistance;
-                
-                // Adjust position to maintain link length
-                // position[i] = position[i] + (1 - lambda) * (position[i-1] - position[i])
-                positions[i] = positions[i] + (1 - lambda) * (positions[i - 1] - positions[i]);
+                float lambda = chain.GetLength(i - 1) / Vec2.Distance(positions[i - 1], positions[i]);
+                positions[i] += (1 - lambda) * (positions[i - 1] - positions[i]);
             }
 
             error = Vec2.Distance(positions[n - 1], target);

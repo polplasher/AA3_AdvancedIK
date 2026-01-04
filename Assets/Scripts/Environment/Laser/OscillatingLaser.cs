@@ -166,7 +166,7 @@ namespace Lasers
             {
                 float t = (float)i / segments;
                 float angle = angleFrom + (angleDiff * Mathf.Deg2Rad * t);
-                UVec2 dir = new UVec2(Mathf.Cos(angle), Mathf.Sin(angle));
+                UVec2 dir = new(Mathf.Cos(angle), Mathf.Sin(angle));
                 UVec3 point = center + (UVec3)(dir * radius);
                 Gizmos.DrawLine(prevPoint, point);
                 prevPoint = point;

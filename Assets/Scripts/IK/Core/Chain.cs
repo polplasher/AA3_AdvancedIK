@@ -11,7 +11,6 @@ public sealed class Chain : MonoBehaviour
     public int JointCount => joints?.Length ?? 0;
     public int SegmentCount => Math.Max(0, JointCount - 1);
     public float TotalLength { get; private set; }
-
     private float[] lengths;
 
     public bool IsValid()

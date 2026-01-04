@@ -16,6 +16,19 @@ public class CCDSolver
         if (positions == null || positions.Length != n)
             positions = chain.GetPositions();
 
+        // Unreachable case: stretch towards the target
+        float distRootToTarget = Vec2.Distance(positions[0], target);
+        if (distRootToTarget > chain.TotalLength)
+        {
+            for (int i = 0; i < n - 1; i++)
+            {
+                Vec2 dir = (target - positions[i]).normalized;
+                positions[i + 1] = positions[i] + dir * chain.GetLength(i);
+            }
+            return new IKResult(1, Vec2.Distance(positions[n - 1], target), false);
+        }
+
+        // Main CCD loop
         int iterations = 0;
         float error = Vec2.Distance(positions[n - 1], target);
 
@@ -27,27 +40,20 @@ public class CCDSolver
             for (int jointIndex = n - 2; jointIndex >= 0; jointIndex--)
             {
                 Vec2 currentJoint = positions[jointIndex];
+                Vec2 endEffector = positions[n - 1];
 
                 // Get vectors from current joint to end effector and target
-                Vec2 toEndEffector = (positions[n - 1] - currentJoint).normalized;
+                Vec2 toEndEffector = (endEffector - currentJoint).normalized;
                 Vec2 toTarget = (target - currentJoint).normalized;
 
-                // Skip if vectors are too small
-                if (toEndEffector.magnitude < 1e-6f || toTarget.magnitude < 1e-6f)
-                    continue;
-
                 // Calculate rotation angle
-                float dotProduct = Vec2.Dot(toEndEffector, toTarget);
-                dotProduct = Math.Clamp(dotProduct, -1.0f, 1.0f);
-                float angle = Math.Acos(dotProduct);
+                float angle = Math.Acos(Math.Clamp(Vec2.Dot(toEndEffector, toTarget), -1f, 1f));
+                
+                // Determine rotation direction (2D cross product Z component)
+                float cross = toEndEffector.x * toTarget.y - toEndEffector.y * toTarget.x;
+                if (cross < 0) angle = -angle;
 
-                // Determine rotation direction using cross product (in 2D, check Z component)
-                // In 2D: cross product Z = x1*y2 - y1*x2
-                float crossZ = toEndEffector.x * toTarget.y - toEndEffector.y * toTarget.x;
-                if (crossZ < 0)
-                    angle = -angle;
-
-                // Rotate all joints from current+1 to end effector around current joint
+                // Rotate all joints from current+1 to end around current joint
                 for (int i = jointIndex + 1; i < n; i++)
                 {
                     positions[i] = Math.RotateAround(positions[i], currentJoint, angle);

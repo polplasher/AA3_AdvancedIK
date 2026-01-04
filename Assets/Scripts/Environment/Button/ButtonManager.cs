@@ -8,7 +8,7 @@ public class ButtonManager : MonoBehaviour
 
     private void Start()
     {
-        buttons = FindObjectsByType<Button>(FindObjectsSortMode.None);
+        buttons = GetComponentsInChildren<Button>(true);
 
         foreach (Button button in buttons)
         {
@@ -29,7 +29,13 @@ public class ButtonManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         // Go to next level
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+        if (nextSceneIndex >= SceneManager.sceneCountInBuildSettings)
+        {
+            nextSceneIndex = 0;
+        }
+
+        SceneManager.LoadScene(nextSceneIndex);
     }
 
     private void OnDisable()
