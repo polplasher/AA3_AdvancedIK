@@ -308,7 +308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   centerOffset: {x: 0, y: 0}
   orbitRadius: 3
-  rotationSpeed: 60
+  rotationSpeed: 80
   gizmoColor: {r: 0, g: 1, b: 1, a: 1}
   gizmoSegments: 32
 --- !u!1001 &317124583
@@ -33965,7 +33965,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   centerOffset: {x: 0, y: 0}
   orbitRadius: 3
-  rotationSpeed: 90
+  rotationSpeed: 120
   gizmoColor: {r: 0, g: 1, b: 1, a: 1}
   gizmoSegments: 32
 --- !u!1660057539 &9223372036854775807
